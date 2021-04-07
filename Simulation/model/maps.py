@@ -50,12 +50,15 @@ def all_paths_utils(u, e, visited, path, path_record):
 def gen_routes(paths, station_inds, vertex_inds, power=False):
     all_routes = {}
     for path in paths:
+        valid = True
         passing_stations = []
         for i in path[1: -1]:
             if i in vertex_inds:
-                invalid = True
-            if i in station_inds:
+                valid = False
+            elif i in station_inds:
                 passing_stations.append(i)
+        if not valid:
+            continue
 
         psets = powerset(passing_stations)
         if not power:
@@ -72,6 +75,7 @@ def gen_routes(paths, station_inds, vertex_inds, power=False):
     return all_routes
 
 class DukeMap():
+
     def __init__(self, csv_fl, skip_station=False):
         self.nodes = []
         self.vertex_inds = [] # The collection of vertices (where bus can stop and change direction)
@@ -195,12 +199,14 @@ class DukeMap():
 
     def plot_simple(self):
         plt.figure(figsize=(12, 6))
-        for node in self.nodes:
+        for i, node in enumerate(self.nodes):
             for neighbor in node.neighbors:
                 plt.plot([node.crd[0], neighbor.crd[0]], [node.crd[1], neighbor.crd[1]], c='b')
             plt.scatter([node.crd[0]], [node.crd[1]], color='r' if node.is_station else 'g')
             if node.is_station:
-                plt.text(node.crd[0], node.crd[1], node.name, ma='right')
+                plt.text(node.crd[0], node.crd[1], "{} {}".format(i, node.name), ma='right')
+            else:
+                plt.text(node.crd[0], node.crd[1], "{}".format(i), ma='right')
         plt.gca().set_aspect('equal')
         plt.savefig('sample.png')
 
