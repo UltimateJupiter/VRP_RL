@@ -1,0 +1,41 @@
+use_gpu: True
+mode: 'train'
+
+env_params:
+    map_dirc: './config/v1'
+    n_bus: 15
+    bus_capacity: 50
+    bus_stop_time: 1
+    skip_station: False
+    frame_rate: 3
+
+reward_params:
+    wait_cost: -0.001
+    opr_cost: -10
+    bus_efficiency_reward: 1000
+    time_penalty_power: 1
+    invalid_route_cost: -1000
+
+agent_params:
+    double_dqn: True
+    batch_size: 32
+    gamma: 0.99
+    episodes: 20
+    loss: 'mse'
+    replay_memory_cap: 10000
+    replay_start: 0
+    reward_verbose_freq: 100
+    replay_freq: 4
+    hist_len: 4
+    target_update_freq: 10000
+    epsilon:
+        start: 0.25
+        end: 0.01
+        end_t: 100000
+    optim_params:
+        lr: 0.00025
+        momentum: 0.95
+        eps: 0.01
+    log_freq: 10000
+    save_freq: 100000
+    save_dir: './tmp'

@@ -1,6 +1,12 @@
-from environ import duke_simple
-from model.vis import *
+from environ import duke_simple, duke_v1
+from random_agents import UniRandAgent
+from env.vis import *
 
+from reward import VRPReward
+
+from joblib import Parallel, delayed
+
+from copy import deepcopy
 # ev = UniRandEvent(1, np.array([200, 0, 1000]), np.array([]))
 
 # for i in range(100):
@@ -9,13 +15,42 @@ from model.vis import *
 import numpy as np
 np.random.seed(1)
 
-M = duke_simple(n_bus=4, device='cpu', skip_station=True, verbose=True)
-print(M.routes)
+# M = duke_simple(n_bus=1,e device='cpu', verbose=False)
 
-for t in range(120):
+reward_rule = VRPReward(wait_cost=0.1, opr_cost=10, bus_efficiency_scale=1000)
+
+M = duke_v1(n_bus=15, device='cpu', reward_rule=reward_rule, verbose=False)
+A = UniRandAgent(M)
+# M_copy = deepcopy(M)
+M.assign_auto_agent(A)
+# print(M.routes)
+vecs = []
+print(M.state_dim, M.action_dim)
+vec = M.vec_flatten
+print(M.unflatten_vec(vec))
+exit()
+for t in range(10000):
+    M.step_auto(reward_verbose=True)
+    # exit()
+    # vis_map(M, M.vec, background=False)
+
+    # vecs.append(M.vec)
+exit()
+Parallel(n_jobs=8, verbose=10)(delayed(vis_map)(M, vec) for vec in vecs)
+
+for vec in vecs:
+    vis_map(M, vec)
+exit()
+
+
+
+
+exit()
+for t in range(1200):
     M.step()
-    # M.print_status()
-M.schedule([0, 1, 2, 3])
+M.print_status()
+exit()
+M.schedule_buses([0, 1, 2, 3])
 for t in range(20):
     M.step()
     M.print_status()

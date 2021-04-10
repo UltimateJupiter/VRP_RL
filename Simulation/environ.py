@@ -1,10 +1,11 @@
 import numpy as np
-from model.events import DiffEvent, UniRandEvent, GaussRandEvent
-from model.playground import Map
+from env.events import DiffEvent, UniRandEvent, GaussRandEvent
+from env.playground import Map
 import os
 import csv
 
 def read_event_csv(M : Map, csv_fl):
+    
     assert os.path.isfile(csv_fl)
     with open(csv_fl, newline='') as csvfile:
         lines = [x for x in csv.reader(csvfile)]
@@ -61,16 +62,20 @@ def get_events(M : Map, dirc):
     gaussian_csv = os.path.join(dirc, 'gaussian_flow.csv')
     add_gaussian_event(M, gaussian_csv)
 
-def make_environ(dirc, n_bus, device, skip_station, **kwargs):
+def make_environ(reward_rule, map_dirc='./config/v1', device='cpu', **kwargs):
 
-    map_csv = os.path.join(dirc, 'map.csv')
+    map_csv = os.path.join(map_dirc, 'map.csv')
 
-    M = Map(map_csv, n_bus, device, skip_station, **kwargs)
-    events_dirc = os.path.join(dirc, 'events')
+    M = Map(map_csv, device, reward_rule, **kwargs)
+    events_dirc = os.path.join(map_dirc, 'events')
     get_events(M, events_dirc)
 
     return M
 
-def duke_simple(n_bus, device, skip_station, **kwargs):
+def duke_simple(n_bus, device, reward_rule, **kwargs):
     dirc = './config/simple'
-    return make_environ(dirc, n_bus, device, skip_station, **kwargs)
+    return make_environ(dirc, device, reward_rule, n_bus=n_bus, frame_rate=3, skip_station=True, **kwargs)
+
+def duke_v1(n_bus, device, reward_rule, **kwargs):
+    dirc = './config/v1'
+    return make_environ(dirc, device, reward_rule, n_bus=n_bus, frame_rate=3, skip_station=False, **kwargs)
