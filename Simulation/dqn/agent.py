@@ -77,7 +77,7 @@ class DQN_Agent(object):
         for i, bus_info in enumerate(vec_bus):
             active, _, loc = bus_info[:3]
             if active:
-                continue
+                schedule[i] = self.M.n_routes
             else:
                 r_ind = np.random.choice(self.M.routes_choice[loc.item()] + [self.M.n_routes])
                 schedule[i] = r_ind
@@ -96,10 +96,11 @@ class DQN_Agent(object):
 
     def act(self, state, epsilon):
         # select epsilon-greedy action
+        # return self.random_act_constrained(state)
         if np.random.random() <= epsilon / 5:
-            return self.random_act_constrained(state)
-        elif np.random.random() <= epsilon :
             return self.random_act(state)
+        elif np.random.random() <= epsilon:
+            return self.random_act_constrained(state)
         else:
             state = Variable(state).unsqueeze(0)
             act_values = self.Qnet.forward(state)   # B*n_actions
@@ -167,12 +168,9 @@ class DQN_Agent(object):
             np.random.seed(e)
 
             episode_rewards = []
-            mean_episode_reward = -float('nan')
-            best_mean_episode_reward = -float('inf')
 
             # Iterate over frames of the episode
             for t in count():
-                
                 # get current state
                 num_updates += 1
                 state = self.M.vec_flatten
@@ -186,8 +184,16 @@ class DQN_Agent(object):
                     print(num_updates)
                 
                 next_state, reward, done = self.M.feedback_step(action, reward_verbose=reward_verbose)
+                
                 if done:
+                    mean_episode_reward = np.mean(episode_rewards)
+                    self.stats["mean_episode_rewards"].append(mean_episode_reward)
+
+                    print("Timestep %d" % (t,))
+                    print("mean reward (episodes) %f" % mean_episode_reward)
+                    print("exploration %f" % self.epsilon.value(t))
                     break
+                
                 
                 self.memory.push(Transition(state, action, reward, next_state))
                 episode_rewards.append(reward)
@@ -198,25 +204,10 @@ class DQN_Agent(object):
                     if num_updates % self.args['target_update_freq'] == 0:
                         self.target_Qnet.load_state_dict(self.Qnet.state_dict())
 
-                if num_updates > self.args['replay_start']:
-                    
-                    if num_updates % self.args['log_freq'] == 0:
-                        if len(episode_rewards) > 0:
-                            mean_episode_reward = np.mean(episode_rewards[-100:])
-                        if len(episode_rewards) > 100:
-                            best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
+                
 
-                        self.stats["mean_episode_rewards"].append(mean_episode_reward)
-                        self.stats["best_mean_episode_rewards"].append(best_mean_episode_reward)
-
-                        print("Timestep %d" % (t,))
-                        print("mean reward (100 episodes) %f" % mean_episode_reward)
-                        print("best mean reward %f" % best_mean_episode_reward)
-                        print("frames %d" % len(episode_rewards))
-                        print("exploration %f" % self.epsilon.value(t))
-
-                    if num_updates % self.args['save_freq'] == 0:
-                        self.save()
+                if num_updates % self.args['save_freq'] == 0:
+                    self.save()
 
     # def eval(self, n_episodes):
     #     for i_ep in range(n_episodes):

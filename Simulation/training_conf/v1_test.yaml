@@ -3,7 +3,7 @@ mode: 'train'
 
 env_params:
     map_dirc: './config/v1'
-    n_bus: 15
+    n_bus: 10
     bus_capacity: 50
     bus_stop_time: 1
     skip_station: False
@@ -27,7 +27,7 @@ agent_params:
     reward_verbose_freq: 100
     replay_freq: 4
     hist_len: 4
-    target_update_freq: 10000
+    target_update_freq: 1000
     epsilon:
         start: 0.25
         end: 0.01
