@@ -35,12 +35,12 @@ class DiffEvent():
 
         self.t_peak, self.dist, self.flow = -1, -1, -1
         self.span = span * M.frame_rate * 60
-        self.reinit()
+        self.reset()
     
     def __str__(self):
         return "DiffRandEV {} -> {} | Tpeak {:.4g}  Tspan {:.4g}  Flow {:.4g}".format(self.self_ind, self.target_ind, self.t_peak/60, self.dist, self.flow)
     
-    def reinit(self):
+    def reset(self):
         self.t_peak = self.t_peak_mean + standard_normal() * self.t_peak_coef_std
         self.dist = self.dist_mean + standard_normal() * self.dist_coef_std
         self.flow = self.flow_mean + standard_normal() * self.flow_coef_std
@@ -79,9 +79,9 @@ class UniRandEvent():
 
         self.coef_std = coef_std
         self.weights = np.zeros_like(self.weights_init)
-        self.reinit()
+        self.reset()
 
-    def reinit(self):
+    def reset(self):
         self.weights = self.weights_init + self.weights_init * np.random.normal(scale=self.coef_std, size=len(self.weights_init))
         self.weights *= (self.weights >= 0)
 
@@ -113,7 +113,7 @@ class GaussRandEvent():
             assert len(weights) == M.n_station
         assert self.weights[self_ind] == 0 # There should be no flow to itself
 
-        self.reinit()
+        self.reset()
 
     def get_flow(self, time : int):
         if time is None:
@@ -121,7 +121,7 @@ class GaussRandEvent():
         flow = np.exp(- np.power(time - self.centers, 2) / (2 * np.power(self.stds, 2)))
         return np.random.poisson(self.weights * flow)
     
-    def reinit(self):
+    def reset(self):
         self.weights = self.weights_init + self.weights_init * np.random.normal(scale=self.coef_std, size=len(self.weights_init))
         self.weights *= (self.weights >= 0)
         self.centers = self.centers_init + self.centers_init * np.random.normal(scale=self.coef_std, size=len(self.weights_init))

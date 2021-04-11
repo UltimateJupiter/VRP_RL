@@ -29,6 +29,7 @@ def main(config):
                      device=network_device,
                      verbose=False,
                      **config['env_params'])
+    M.print_events()
 
     agent = DQN_Agent(M, config['agent_params'], network_device, memory_device)
     if config['mode'] == 'train':

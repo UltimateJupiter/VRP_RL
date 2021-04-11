@@ -10,5 +10,6 @@ def powerset(s):
 
 def log(info, color='green', print_log=True):
     if print_log:
-        print(colored("[{}]  ", color).format(datetime.datetime.now()) + info)
+        # print(colored("[{}]  ", color).format(datetime.datetime.now()) + info)
+        print("[{}]  ".format(datetime.datetime.now()) + info)
         

@@ -14,7 +14,12 @@ def read_event_csv(M : Map, csv_fl):
         assert lines[i][1] == M.stations[i].name
     assert lines[M.n_station][0] == '***'
     assert lines[M.n_station + 2][0] == '***'
-    return [[float(i) for i in x] for x in lines[M.n_station + 3:]]
+    config = []
+    for l in lines[M.n_station + 3:]:
+        if len(l) <= 1:
+            continue
+        config.append([float(i) for i in l])
+    return config
 
 def add_diff_event(M : Map, diff_csv):
 

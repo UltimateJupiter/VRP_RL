@@ -97,9 +97,9 @@ class DQN_Agent(object):
     def act(self, state, epsilon):
         # select epsilon-greedy action
         # return self.random_act_constrained(state)
-        if np.random.random() <= epsilon / 5:
-            return self.random_act(state)
-        elif np.random.random() <= epsilon:
+        # if np.random.random() <= epsilon / 5:
+        # return self.random_act(state)
+        if np.random.random() <= epsilon:
             return self.random_act_constrained(state)
         else:
             state = Variable(state).unsqueeze(0)
@@ -180,9 +180,6 @@ class DQN_Agent(object):
                     action = self.act(state, 1)
 
                 reward_verbose = True if t % self.args['reward_verbose_freq'] == 0 else False
-                if reward_verbose:
-                    print(num_updates)
-                
                 next_state, reward, done = self.M.feedback_step(action, reward_verbose=reward_verbose)
                 
                 if done:
@@ -190,7 +187,7 @@ class DQN_Agent(object):
                     self.stats["mean_episode_rewards"].append(mean_episode_reward)
 
                     print("Timestep %d" % (t,))
-                    print("mean reward (episodes) %f" % mean_episode_reward)
+                    print("mean reward (episode) %f" % mean_episode_reward)
                     print("exploration %f" % self.epsilon.value(t))
                     break
                 

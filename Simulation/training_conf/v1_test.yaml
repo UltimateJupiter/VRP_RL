@@ -4,7 +4,7 @@ mode: 'train'
 env_params:
     map_dirc: './config/v1'
     n_bus: 10
-    bus_capacity: 50
+    bus_capacity: 40
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
@@ -20,9 +20,9 @@ agent_params:
     double_dqn: True
     batch_size: 32
     gamma: 0.99
-    episodes: 20
+    episodes: 2000
     loss: 'mse'
-    replay_memory_cap: 10000
+    replay_memory_cap: 20000
     replay_start: 0
     reward_verbose_freq: 100
     replay_freq: 4

@@ -22,7 +22,7 @@ class Map(DukeMap):
         super().__init__(csv_fl, frame_rate, skip_station)
         self.t = 0
         self.dev = device
-        self.total_t = 24 * 60 * self.frame_rate
+        self.total_t = 12 * 60 * self.frame_rate
         
         self.n_bus = n_bus
         self.n_station = len(self.station_inds)
@@ -103,7 +103,7 @@ class Map(DukeMap):
     @property
     def vec_flatten(self):
         vec_bus, vec_station, t = self.vec
-        res = torch.cat([vec_bus.view(-1), vec_station.view(-1), torch.Tensor([t], device=self.dev)]) # pylint:disable=no-member
+        res = torch.cat([vec_bus.view(-1), vec_station.view(-1), torch.Tensor([t]).to(self.dev)]) # pylint:disable=no-member
         return res
 
     def unflatten_vec(self, state):
@@ -160,7 +160,7 @@ class Bus():
 
         self.active = False
 
-        self.passengers = torch.zeros(M.n_station) # pylint: disable=no-member
+        self.passengers = torch.zeros(M.n_station, device=self.dev) # pylint: disable=no-member
         self.path = None
         self.stop_stations = None
 
@@ -273,7 +273,7 @@ class Bus():
     @property
     def vec(self):
         info = [int(self.active), self.route_ind, int(self.location), self.capacity]
-        vec = torch.cat([torch.Tensor(info), self.passengers]).float() # pylint: disable=no-member
+        vec = torch.cat([torch.Tensor(info).to(self.dev), self.passengers]).float() # pylint: disable=no-member
         return vec.to(self.dev)
 
 
@@ -369,6 +369,8 @@ class Station():
 
     def reset(self):
         self.queue = [[] for s in range(self.M.n_station)]
+        for event in self.events:
+            event.reset()
 
     def comp_vec(self):
         current_time = self.M.t
