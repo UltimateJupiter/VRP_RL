@@ -141,10 +141,10 @@ class Map(DukeMap):
         n_invalid_route = self.schedule_buses(action)
         self.env_step(**kwargs)
         done = self.t >= self.total_t
-        reward = self.reward(n_invalid_route, **kwargs)
+        reward, feedback = self.reward(n_invalid_route, **kwargs)
         next_state = self.vec_flatten
 
-        return next_state, reward, done
+        return next_state, reward, done, feedback
         
 
 class Bus():

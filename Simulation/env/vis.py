@@ -150,7 +150,7 @@ def vis_map(M : Map, vec, height=10, margin=0.3, cmap='jet', background=True):
     scale = [scalex, scaley]
 
     wait_reward, opr_reward, queue_length, bus_efficiency, bus_efficiency_raw = M.reward_rule.rewards_terms(vec)
-    ax.text(scalex * 5, scaley * 3, "t={}\nQueue:{}  WaitCost={:.4g}  OprCost={:.4g}  BusEfficiency={:.3g}%".format(t, int(queue_length.cpu().numpy()), -wait_reward.cpu(), -opr_reward.cpu(), bus_efficiency_raw.cpu() * 100), transform=ax.transAxes, fontsize=scaley * 1200)
+    ax.text(scalex * 5, scaley * 3, "t={}\nQueue:{}  WaitCost={:.4g}  OprCost={:.4g}  BusEfficiency={:.3g}%".format(t, int(queue_length), -wait_reward, -opr_reward, bus_efficiency_raw * 100), transform=ax.transAxes, fontsize=scaley * 1200)
 
     for edge in M.edges:
         i, j = edge

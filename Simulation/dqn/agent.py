@@ -14,12 +14,14 @@ from .memory import Transition, ReplayMemory
 from .schedule import LinearSchedule
 from .env.playground import Map
 from .env.utils import log
+from .env.vis import vis_map
 
 use_cuda = torch.cuda.is_available()
 FloatTensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if use_cuda else torch.LongTensor
 ByteTensor = torch.cuda.ByteTensor if use_cuda else torch.ByteTensor
 Tensor = FloatTensor
+
 
 class DQN_Agent(object):
 
@@ -30,6 +32,7 @@ class DQN_Agent(object):
         self.dev = M.dev
         self.args = args
 
+        self.info_list = ['queue', 'wait', 'opr', 'efficiency', 'invalid_args']
         assert self.dev == network_device
 
         self.state_size = M.state_dim
@@ -54,10 +57,8 @@ class DQN_Agent(object):
 
         self.optimizer = optim.RMSprop(self.Qnet.parameters(), **self.args['optim_params'])
 
-        self.stats = {
-            "mean_episode_rewards": [],
-            "best_mean_episode_rewards": []
-        }
+        self.stats = {"reward": []}
+        self.stats.update({arg: [] for arg in self.info_list})
         self.save_dir = args['save_dir']
 
     def setup_controller(self):
@@ -157,9 +158,17 @@ class DQN_Agent(object):
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
 
+    def verbose_feedback(self, reward, feedback, info=''):
+        res = info
+        res += ' | reward: {:.5g} '.format(reward)
+        for i, item in enumerate(feedback):
+            res += ' {}: {:.4g} '.format(self.info_list[i], item)
+        print(res)
+
     def train(self):
         
         num_updates = 0
+        total_steps = 0
 
         for e in range(self.args['episodes']):
 
@@ -168,44 +177,46 @@ class DQN_Agent(object):
             np.random.seed(e)
 
             episode_rewards = []
+            episode_feedback = []
 
             # Iterate over frames of the episode
             for t in count():
                 # get current state
-                num_updates += 1
+                # vis_map(self.M, self.M.vec)
                 state = self.M.vec_flatten
                 if t > self.args['replay_start']:
-                    action = self.act(state, self.epsilon.value(t))
+                    action = self.act(state, self.epsilon.value(e))
                 else:
                     action = self.act(state, 1)
 
-                reward_verbose = True if t % self.args['reward_verbose_freq'] == 0 else False
-                next_state, reward, done = self.M.feedback_step(action, reward_verbose=reward_verbose)
+                next_state, reward, done, feedback = self.M.feedback_step(action)
+                
+                if t % self.args['reward_verbose_freq'] == 0:
+                    self.verbose_feedback(reward, feedback, "\te{} t{} s{}".format(e, t, total_steps))
                 
                 if done:
-                    mean_episode_reward = np.mean(episode_rewards)
-                    self.stats["mean_episode_rewards"].append(mean_episode_reward)
+                    mean_reward = np.mean(episode_rewards)
+                    self.stats["reward"].append(mean_reward)
+                    mean_feedback = np.mean(np.vstack(episode_feedback), axis=0)
+                    for i, item in enumerate(mean_feedback):
+                        self.stats[self.info_list[i]].append(item)
 
-                    print("Timestep %d" % (t,))
-                    print("mean reward (episode) %f" % mean_episode_reward)
-                    print("exploration %f" % self.epsilon.value(t))
+                    self.verbose_feedback(mean_reward, mean_feedback, "\nMEAN Episode {}".format(e))
+                    print("exploration {:.4g}\n".format(self.epsilon.value(e)))
                     break
-                
                 
                 self.memory.push(Transition(state, action, reward, next_state))
                 episode_rewards.append(reward)
+                episode_feedback.append(feedback)
 
-                if num_updates > self.args['replay_start'] and t % self.args['replay_freq'] == 0:
+                if total_steps > self.args['replay_start'] and total_steps % self.args['replay_freq'] == 0:
                     self.replay()
                     num_updates += 1
                     if num_updates % self.args['target_update_freq'] == 0:
                         self.target_Qnet.load_state_dict(self.Qnet.state_dict())
 
-                
-
-                if num_updates % self.args['save_freq'] == 0:
-                    self.save()
-
+                total_steps += 1
+        print(self.stats)
     # def eval(self, n_episodes):
     #     for i_ep in range(n_episodes):
     #         state = np.zeros(self.state_size, dtype=np.uint8)
