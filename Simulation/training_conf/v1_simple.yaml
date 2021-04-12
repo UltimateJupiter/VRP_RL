@@ -19,7 +19,7 @@ reward_params:
     opr_reward: 0
     efficiency_reward: 0
     time_penalty_power: 1
-    invalid_route_reward: -100
+    invalid_route_reward: -1000
 
 agent_params:
     double_dqn: True
@@ -30,7 +30,7 @@ agent_params:
     fix_date: True
     replay_memory_cap: 100000
     replay_start: 0
-    reward_verbose_freq: 10
+    reward_verbose_freq: 500
     replay_freq: 1
     hist_len: 4
     target_update_freq: 1000
