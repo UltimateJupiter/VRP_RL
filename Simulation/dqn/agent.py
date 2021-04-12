@@ -16,6 +16,8 @@ from .env.playground import Map
 from .env.utils import log
 from .env.vis import vis_map
 
+import neptune
+
 use_cuda = torch.cuda.is_available()
 FloatTensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if use_cuda else torch.LongTensor
@@ -25,7 +27,7 @@ Tensor = FloatTensor
 
 class DQN_Agent(object):
 
-    def __init__(self, M : Map, args, network_device, memory_device):
+    def __init__(self, M : Map, args, network_device, memory_device, use_neptune=False):
 
         log("Initializing Agent")
         self.M = M
@@ -39,6 +41,7 @@ class DQN_Agent(object):
         self.n_action, self.action_size = M.action_dim
 
         # setup controller model and replay memory
+        self.use_neptune = use_neptune
         self.setup_controller()
 
         self.memory = ReplayMemory(
@@ -95,12 +98,12 @@ class DQN_Agent(object):
             schedule[i] = r_ind
         return schedule
 
-    def act(self, state, epsilon):
+    def act(self, state, epsilon, rng):
         # select epsilon-greedy action
         # return self.random_act_constrained(state)
         # if np.random.random() <= epsilon / 5:
         # return self.random_act(state)
-        if np.random.random() <= epsilon:
+        if rng.random() <= epsilon:
             return self.random_act_constrained(state)
         else:
             state = Variable(state).unsqueeze(0)
@@ -170,11 +173,16 @@ class DQN_Agent(object):
         num_updates = 0
         total_steps = 0
 
+        action_rng = np.random.RandomState(0)
+
         for e in range(self.args['episodes']):
 
             log("Episode {}".format(e), color='red')
+            if self.args['fix_date']:
+                np.random.seed(0)
+            else:
+                np.random.seed(e)
             self.M.reset()
-            np.random.seed(e)
 
             episode_rewards = []
             episode_feedback = []
@@ -185,11 +193,11 @@ class DQN_Agent(object):
                 # vis_map(self.M, self.M.vec)
                 state = self.M.vec_flatten
                 if t > self.args['replay_start']:
-                    action = self.act(state, self.epsilon.value(e))
+                    action = self.act(state, self.epsilon.value(e), action_rng)
                 else:
-                    action = self.act(state, 1)
+                    action = self.act(state, 1, action_rng)
 
-                next_state, reward, done, feedback = self.M.feedback_step(action)
+                next_state, reward, done, feedback, scale = self.M.feedback_step(action)
                 
                 if t % self.args['reward_verbose_freq'] == 0:
                     self.verbose_feedback(reward, feedback, "\te{} t{} s{}".format(e, t, total_steps))
@@ -202,7 +210,13 @@ class DQN_Agent(object):
                         self.stats[self.info_list[i]].append(item)
 
                     self.verbose_feedback(mean_reward, mean_feedback, "\nMEAN Episode {}".format(e))
+                    self.verbose_feedback(mean_reward, mean_feedback * scale, "MEAN  Scaled {}".format(e))
                     print("exploration {:.4g}\n".format(self.epsilon.value(e)))
+                    
+                    if self.use_neptune:
+                        neptune.log_metric('reward', e, mean_reward)
+                        for i, item in enumerate(mean_feedback):
+                            neptune.log_metric(self.info_list[i], item)
                     break
                 
                 self.memory.push(Transition(state, action, reward, next_state))
@@ -216,7 +230,7 @@ class DQN_Agent(object):
                         self.target_Qnet.load_state_dict(self.Qnet.state_dict())
 
                 total_steps += 1
-        print(self.stats)
+        # print(self.stats)
     # def eval(self, n_episodes):
     #     for i_ep in range(n_episodes):
     #         state = np.zeros(self.state_size, dtype=np.uint8)

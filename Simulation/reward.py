@@ -26,7 +26,7 @@ class VRPReward():
         if bus_capacity > 0:
             efficiency = torch.Tensor.sum(vec_bus[:, 4:]) / bus_capacity
         else:
-            efficiency = 0
+            efficiency = torch.Tensor.sum(vec_bus[:, 4:]) * 0
 
         queue = torch.Tensor.sum(queue_length)
         info = [queue, wait, opr, efficiency]
@@ -39,4 +39,6 @@ class VRPReward():
                + opr * self.opr_reward \
                + efficiency * self.efficiency_reward \
                + n_invalid_route * self.invalid_route_reward
-        return reward, np.array([queue.item(), wait.item(), opr.item(), efficiency.item(), n_invalid_route])
+        feedback = np.array([queue.cpu().item(), wait.cpu().item(), opr.cpu().item(), efficiency.cpu().item(), n_invalid_route])
+        scale = np.array([self.queue_reward, self.wait_reward, self.opr_reward, self.efficiency_reward, self.invalid_route_reward])
+        return reward, feedback, scale

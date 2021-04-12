@@ -27,8 +27,8 @@ pre_set_config = {
     ],
     "cpu-s":[
         "90:00:00",
-        8,
-        32,
+        2,
+        16,
         0,
         "compsci"
     ],
@@ -61,7 +61,7 @@ args = parser.parse_args()
 
 assert args.r is not None, 'please specify the job you want to run after argument -r'
 
-sh_tmp = "./.sbatchsrun.sh"
+sh_tmp = "./.DQN_run.sh"
 if os.path.isfile(sh_tmp):
     os.remove(sh_tmp)
 writer = open(sh_tmp, 'w')
@@ -109,11 +109,11 @@ if not os.path.isdir(log_dir):
     os.mkdir(log_dir)
 
 if args.exclude is None:
-    os.system("sbatch .sbatchsrun.sh")
+    os.system("sbatch .DQN_run.sh")
 else:
     if not args.nooutput:
         print("excluding {}".format(args.exclude))
-    os.system("sbatch --exclude={} .sbatchsrun.sh".format(args.exclude))
+    os.system("sbatch --exclude={} .DQN_run.sh".format(args.exclude))
 if not args.nooutput:
     print("\nTo check info, use sacct -j JobID\nTo cancel job, use scancel JobID\nThe log is stored in ./sbatchlog/slurm-JobID.out")
-os.system("rm .sbatchsrun.sh")
+os.system("rm .DQN_run.sh")

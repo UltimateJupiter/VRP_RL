@@ -11,9 +11,9 @@ class DuelingNetwork(nn.Module):
 
         super().__init__()
 
-        self.model = nn.Sequential(nn.Linear(obs, 128), 
+        self.model = nn.Sequential(nn.Linear(obs, 512), 
                                    nn.ReLU(), 
-                                   nn.Linear(128,128), 
+                                   nn.Linear(512, 128), 
                                    nn.ReLU())
 
         self.value_head = nn.Linear(128, 1)

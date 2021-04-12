@@ -6,7 +6,7 @@ neptune_params:
     proj_name: 'ultimatejz/VRP-DQN'
 
 env_params:
-    map_dirc: './config/v1'
+    map_dirc: './config/v1_simple'
     n_bus: 10
     bus_capacity: 40
     bus_stop_time: 1
@@ -14,8 +14,8 @@ env_params:
     frame_rate: 3
 
 reward_params:
-    queue_reward: -0.1
-    wait_reward: 0
+    queue_reward: 0
+    wait_reward: -0.01
     opr_reward: 0
     efficiency_reward: 0
     time_penalty_power: 1
@@ -27,15 +27,15 @@ agent_params:
     gamma: 0.99
     episodes: 400
     loss: 'mse'
-    fix_date: False
+    fix_date: True
     replay_memory_cap: 100000
     replay_start: 0
-    reward_verbose_freq: 500
+    reward_verbose_freq: 10
     replay_freq: 1
     hist_len: 4
     target_update_freq: 1000
     epsilon:
-        start: 0.9
+        start: 0.1
         end: 0.01
         end_t: 400
     optim_params:

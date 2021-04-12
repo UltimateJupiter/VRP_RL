@@ -48,13 +48,13 @@ class Map(DukeMap):
             node = self.nodes[s_ind]
             assert node.is_station
             station = Station(self, s_ind, node.name, node, verbose=self.verbose)
-            station.print_status()
+            # station.print_status()
             self.stations.append(station)
     
     def init_buses(self, capacity, stop_time):
         for b_ind in range(self.n_bus):
             bus = Bus(self, b_ind, capacity, stop_time_total=stop_time, verbose=self.verbose)
-            bus.print_status()
+            # bus.print_status()
             self.buses.append(bus)
 
     def refresh(self):
@@ -141,10 +141,10 @@ class Map(DukeMap):
         n_invalid_route = self.schedule_buses(action)
         self.env_step(**kwargs)
         done = self.t >= self.total_t
-        reward, feedback = self.reward(n_invalid_route, **kwargs)
+        reward, feedback, scale = self.reward(n_invalid_route, **kwargs)
         next_state = self.vec_flatten
 
-        return next_state, reward, done, feedback
+        return next_state, reward, done, feedback, scale
         
 
 class Bus():
