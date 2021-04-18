@@ -1,5 +1,5 @@
 import numpy as np
-from env.events import DiffEvent, UniRandEvent, GaussRandEvent
+from env.events import DiffEvent, UniRandEvent, GaussRandEvent, IterEvent
 from env.playground import Map
 import os
 import csv
@@ -28,6 +28,15 @@ def add_diff_event(M : Map, diff_csv):
         assert s <= M.n_station
         assert d <= M.n_station
         ev = DiffEvent(M, int(s), int(d), time, dist, flow)
+        M.stations[int(s)].add_event(ev)
+
+def add_iter(M : Map, diff_csv):
+
+    event_configs = read_event_csv(M, diff_csv)
+    for s, d, flow, start, lapse in event_configs:
+        assert s <= M.n_station
+        assert d <= M.n_station
+        ev = IterEvent(M, int(s), int(d), flow, start, lapse)
         M.stations[int(s)].add_event(ev)
 
 def add_uniform_event(M : Map, uniform_csv):
@@ -66,6 +75,9 @@ def get_events(M : Map, dirc):
 
     gaussian_csv = os.path.join(dirc, 'gaussian_flow.csv')
     add_gaussian_event(M, gaussian_csv)
+
+    iter_csv = os.path.join(dirc, 'iter_flow.csv')
+    add_iter(M, iter_csv)
 
 def make_environ(reward_rule, map_dirc='./config/v1', device='cpu', **kwargs):
 

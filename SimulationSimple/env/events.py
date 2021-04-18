@@ -130,6 +130,34 @@ class GaussRandEvent():
     def __str__(self):
         return "GaussianRandEV {} | center {:.4g} | std {:.4g} | weights {}".format(self.self_ind, self.centers[0] / 60 / self.M.frame_rate, self.stds[0] / 60 / self.M.frame_rate, self.weights)
 
+class IterEvent():
+
+    def __init__(self, M, self_ind : int, target_ind : int, flow : int, begin : int, lapse : int, end=1e8):
+
+        self.M = M
+        self.self_ind = self_ind
+        self.target_ind = target_ind
+        self.flow = flow
+        self.begin = begin
+        self.end = end
+        self.lapse = lapse
+        self.reset()
+
+    def get_flow(self, time : int):
+        ret = np.zeros(self.M.n_station)
+        if time is None:
+            time = self.M.t
+        if time >= self.begin and time < self.end:
+            if time % self.lapse == self.begin % self.lapse:
+                ret[self.target_ind] = np.random.poisson(self.flow)
+        return ret
+    
+    def reset(self):
+        return
+    
+    def __str__(self):
+        return "IterEvent {} | flow {:.4g} | start {:.4g} | lapse {}".format(self.self_ind, self.centers[0] / 60 / self.M.frame_rate, self.stds[0] / 60 / self.M.frame_rate, self.weights)
+
 
 def vis_event_diff():
     

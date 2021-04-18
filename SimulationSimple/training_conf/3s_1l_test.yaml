@@ -8,7 +8,7 @@ neptune_params:
 env_params:
     map_dirc: './config/3s_1l_exp'
     n_bus: 1
-    bus_capacity: 40
+    bus_capacity: 12
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
@@ -31,7 +31,7 @@ agent_params:
     fix_date: True
     replay_memory_cap: 100000
     replay_start: 0
-    reward_verbose_freq: 500
+    reward_verbose_freq: 200
     replay_freq: 1
     hist_len: 4
     target_update_freq: 1000
