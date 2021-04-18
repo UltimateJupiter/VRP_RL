@@ -18,16 +18,15 @@ np.random.seed(1)
 # M = duke_simple(n_bus=1,e device='cpu', verbose=False)
 
 reward_rule = VRPReward()
-M = make_environ(reward_rule, map_dirc='./config/naive2x2')
+M = make_environ(reward_rule, map_dirc='./config/3s_1l_exp')
+A = UniRandAgent(M)
+M.assign_auto_agent(A)
 vecs = []
-print(M.state_dim, M.action_dim)
-vec = M.vec_flatten
-print(M.unflatten_vec(vec))
-exit()
 for t in range(10000):
     M.step_auto(reward_verbose=True)
     # exit()
-    # vis_map(M, M.vec, background=False)
+    vis_map(M, M.vec, background=False, margin=1)
+    print(t)
 
     # vecs.append(M.vec)
 exit()

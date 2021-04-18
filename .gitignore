@@ -133,3 +133,4 @@ cython_debug/
 .vscode/
 
 sbatchlog/
+.DS_Store
