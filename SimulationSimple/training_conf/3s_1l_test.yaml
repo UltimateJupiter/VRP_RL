@@ -7,7 +7,7 @@ neptune_params:
 
 env_params:
     map_dirc: './config/3s_1l_exp'
-    n_bus: 10
+    n_bus: 1
     bus_capacity: 40
     bus_stop_time: 1
     skip_station: False
@@ -16,7 +16,7 @@ env_params:
 
 reward_params:
     queue_reward: 0
-    wait_reward: -0.01
+    wait_reward: 0
     opr_reward: 0
     efficiency_reward: 0
     time_penalty_power: 1

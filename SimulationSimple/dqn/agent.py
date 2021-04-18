@@ -221,7 +221,7 @@ class DQN_Agent(object):
                     break
                 
                 self.memory.push(Transition(state, action, reward, next_state))
-                episode_rewards.append(reward)
+                episode_rewards.append(reward.item())
                 episode_feedback.append(feedback)
 
                 if total_steps > self.args['replay_start'] and total_steps % self.args['replay_freq'] == 0:

@@ -327,7 +327,7 @@ class Station():
         pendings = self.queue * station_mask
         if torch.sum(pendings) == 0:
             return
-        new_passengers = torch.zeros(self.M.n_station, device=self.dev) # pylint:disable=no-member
+        new_passengers = torch.zeros(self.M.n_station) # pylint:disable=no-member
         if torch.sum(pendings) <= remain_seats:
             new_passengers += pendings
 
@@ -343,7 +343,7 @@ class Station():
                 new_passengers[ind] -= 1
                 diff = torch.sum(new_passengers) - remain_seats
 
-        bus.passengers += new_passengers
+        bus.passengers += new_passengers.to(self.M.dev)
         self.queue -= new_passengers
 
     def print_status(self):
