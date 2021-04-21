@@ -21,14 +21,12 @@ FloatTensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if use_cuda else torch.LongTensor
 ByteTensor = torch.cuda.ByteTensor if use_cuda else torch.ByteTensor
 Tensor = FloatTensor
+import neptune
 
 
 class DQN_Agent(object):
 
     def __init__(self, M : Map, args, network_device, memory_device, use_neptune=False):
-
-        if use_neptune:
-            import neptune
 
         log("Initializing Agent")
         self.M = M
