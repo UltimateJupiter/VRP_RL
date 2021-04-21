@@ -18,14 +18,19 @@ np.random.seed(1)
 # M = duke_simple(n_bus=1,e device='cpu', verbose=False)
 
 reward_rule = VRPReward()
-M = make_environ(reward_rule, map_dirc='./config/3s_1l_exp')
+M = make_environ(reward_rule, map_dirc='./config/simple', n_bus=2, bus_capacity=30)
 A = UniRandAgent(M)
 M.assign_auto_agent(A)
+print(M.n_routes)
+exit()
 vecs = []
 for t in range(10000):
     M.step_auto(reward_verbose=True)
     # exit()
-    vis_map(M, M.vec, background=False, margin=1)
+    # vis_map(M, M.vec, background=False, margin=1)
+    # exit()
+    if t > 60 * 4 * 3:
+        vis_map(M, M.vec, background=False, margin=1)
     print(t)
 
     # vecs.append(M.vec)

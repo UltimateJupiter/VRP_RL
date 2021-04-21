@@ -113,7 +113,7 @@ def plot_bus(fig, ax, bus : Bus, bus_vec, C, scale, stack_count, bar=True):
     ax.add_patch(plt.Rectangle(rect_anchor, width=w, height=h, ec=bus_color, fc='w'))
     ax.text(crd[0] + w/2 + 10, crd[1], "{}/{}".format(int(sum(passengers)), capacity), ha='left', va='center', fontsize=font_size, color=bus_color)
     ax.text(crd[0] - w/2 - 10, crd[1], "#{}".format(ind), ha='right', va='center', fontsize=font_size, color=bus_color)
-    ax.text(crd[0] - w/2 - 10, crd[1] - h/2, "{} {}".format(location_onehot, route_onehot), ha='right', va='center', fontsize=font_size, color=bus_color)
+    # ax.text(crd[0] - w/2 - 10, crd[1] - h/2, "{} {}".format(location_onehot, route_onehot), ha='right', va='center', fontsize=font_size, color=bus_color)
 
 def get_map_image(M, x_scale, y_scale, br=0.5):
     center_lat, center_long = M.center_lat, M.center_long * M.correction_long
