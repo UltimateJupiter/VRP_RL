@@ -67,17 +67,29 @@ def add_gaussian_event(M : Map, gaussian_csv):
 def get_events(M : Map, dirc):
     assert os.path.isdir(dirc)
 
-    diff_csv = os.path.join(dirc, 'diffusion_flow.csv')
-    add_diff_event(M, diff_csv)
+    try:
+        diff_csv = os.path.join(dirc, 'diffusion_flow.csv')
+        add_diff_event(M, diff_csv)
+    except:
+        print('Failed fetching diffusion')
 
-    uniform_csv = os.path.join(dirc, 'uniform_flow.csv')
-    add_uniform_event(M, uniform_csv)
-
-    gaussian_csv = os.path.join(dirc, 'gaussian_flow.csv')
-    add_gaussian_event(M, gaussian_csv)
-
-    iter_csv = os.path.join(dirc, 'iter_flow.csv')
-    add_iter(M, iter_csv)
+    try:
+        uniform_csv = os.path.join(dirc, 'uniform_flow.csv')
+        add_uniform_event(M, uniform_csv)
+    except:
+        print('Failed fetching uniform')
+    
+    try:
+        gaussian_csv = os.path.join(dirc, 'gaussian_flow.csv')
+        add_gaussian_event(M, gaussian_csv)
+    except:
+        print('Failed fetching gaussian')
+    
+    try:
+        iter_csv = os.path.join(dirc, 'iter_flow.csv')
+        add_iter(M, iter_csv)
+    except:
+        print('Failed fetching iter')
 
 def make_environ(reward_rule, map_dirc='./config/v1', device='cpu', **kwargs):
 

@@ -6,18 +6,18 @@ neptune_params:
     proj_name: 'ultimatejz/VRP-DQN'
 
 env_params:
-    map_dirc: './config/3s_1l_exp'
-    n_bus: 1
-    bus_capacity: 12
+    map_dirc: './config/simple'
+    n_bus: 4
+    bus_capacity: 60
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
-    total_time: 4
+    total_time: 24
 
 reward_params:
     queue_reward: -1
     wait_reward: 0
-    opr_reward: 1000
+    opr_reward: 100
     efficiency_reward: 0
     time_penalty_power: 1
     invalid_route_reward: -1000

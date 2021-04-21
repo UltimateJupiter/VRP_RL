@@ -12,6 +12,7 @@ env_params:
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
+    total_time: 10
 
 reward_params:
     queue_reward: -0.1

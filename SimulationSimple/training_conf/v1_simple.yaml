@@ -1,6 +1,6 @@
 use_gpu: True
 mode: 'train'
-use_neptune: True
+use_neptune: False
 
 neptune_params:
     proj_name: 'ultimatejz/VRP-DQN'
