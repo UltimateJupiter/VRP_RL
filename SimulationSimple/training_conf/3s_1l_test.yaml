@@ -1,9 +1,9 @@
 use_gpu: True
 mode: 'train'
-use_neptune: False
+use_neptune: True
 
 neptune_params:
-    proj_name: 'ultimatejz/VRP-DQN'
+    proj_name: 'ultimatejz/VRP-DQN-new'
 
 env_params:
     map_dirc: './config/3s_1l_exp'
@@ -15,9 +15,9 @@ env_params:
     total_time: 4
 
 reward_params:
-    queue_reward: -1
+    queue_reward: -2
     wait_reward: 0
-    opr_reward: 1000
+    opr_reward: 100
     efficiency_reward: 0
     time_penalty_power: 1
     invalid_route_reward: -1000
@@ -26,7 +26,7 @@ agent_params:
     double_dqn: True
     batch_size: 32
     gamma: 0.99
-    episodes: 400
+    episodes: 1000
     loss: 'mse'
     fix_date: False
     replay_memory_cap: 100000
@@ -38,7 +38,7 @@ agent_params:
     epsilon:
         start: 0.1
         end: 0.001
-        end_t: 400
+        end_t: 1000
     optim_params:
         lr: 0.0001
         momentum: 0.95
