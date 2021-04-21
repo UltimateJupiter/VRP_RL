@@ -15,9 +15,9 @@ env_params:
     total_time: 4
 
 reward_params:
-    queue_reward: 0
+    queue_reward: -1
     wait_reward: 0
-    opr_reward: 0
+    opr_reward: 1000
     efficiency_reward: 0
     time_penalty_power: 1
     invalid_route_reward: -1000
@@ -37,7 +37,7 @@ agent_params:
     target_update_freq: 1000
     epsilon:
         start: 0.1
-        end: 0.01
+        end: 0.001
         end_t: 400
     optim_params:
         lr: 0.0001

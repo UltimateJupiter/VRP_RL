@@ -107,7 +107,7 @@ class Map(DukeMap):
         return res
 
     def unflatten_vec(self, state):
-        bus_len = self.n_bus * (4 + self.n_station)
+        bus_len = self.n_bus * (4 + self.n_station * 2 + 1 + self.n_routes)
         vec_bus, vec_station, t = state[:bus_len], state[bus_len:-1], state[-1]
         vec_bus = vec_bus.view(self.state_dims[0])
         vec_station = vec_station.view(self.state_dims[1])
@@ -159,7 +159,7 @@ class Bus():
 
         self.active = False
 
-        self.passengers = torch.zeros(M.n_station, device=self.dev) # pylint: disable=no-member
+        self.passengers = torch.zeros(M.n_station) # pylint: disable=no-member
         self.path = None
         self.stop_stations = None
 
@@ -256,7 +256,7 @@ class Bus():
     def reset(self):
         self.active = False
 
-        self.passengers = torch.zeros(self.M.n_station, device=self.dev) # pylint: disable=no-member
+        self.passengers = torch.zeros(self.M.n_station) # pylint: disable=no-member
         self.path = None
         self.stop_stations = None
 
@@ -270,9 +270,25 @@ class Bus():
         return self.M.nodes[self.location].crd
 
     @property
+    def vec_location(self):
+        location_onehot = torch.zeros(self.M.n_station + 1)
+        if self.location < self.M.n_station:
+            location_onehot[self.location] = 1
+        else:
+            location_onehot[-1] = 1
+        return location_onehot
+
+    @property
+    def vec_route(self):
+        route_onehot = torch.zeros(self.M.n_routes)
+        if self.active:
+            route_onehot[self.route_ind] = 1
+        return route_onehot
+
+    @property
     def vec(self):
         info = [int(self.active), self.route_ind, int(self.location), self.capacity]
-        vec = torch.cat([torch.Tensor(info).to(self.dev), self.passengers]).float() # pylint: disable=no-member
+        vec = torch.cat([torch.Tensor(info), self.passengers, self.vec_location, self.vec_route]).float().to(self.M.dev)
         return vec.to(self.dev)
 
 

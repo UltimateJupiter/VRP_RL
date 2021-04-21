@@ -11,9 +11,11 @@ class DuelingNetwork(nn.Module):
 
         super().__init__()
 
-        self.model = nn.Sequential(nn.Linear(obs, 256), 
+        self.model = nn.Sequential(nn.Linear(obs, 512), 
                                    nn.ReLU(), 
-                                   nn.Linear(256, 128), 
+                                   nn.Linear(512, 256), 
+                                   nn.ReLU(), 
+                                   nn.Linear(256, 256), 
                                    nn.ReLU())
 
         self.value_head = nn.Linear(128, 1)
@@ -42,6 +44,8 @@ class BranchingQNetwork(nn.Module):
         self.model = nn.Sequential(nn.Linear(obs, 512), 
                                    nn.ReLU(),
                                    nn.Linear(512,256), 
+                                   nn.ReLU(),
+                                   nn.Linear(256,256), 
                                    nn.ReLU())
 
         self.value_head = nn.Linear(256, 1)
@@ -55,7 +59,6 @@ class BranchingQNetwork(nn.Module):
         q_val = value.unsqueeze(2) + advs - advs.mean(2, keepdim=True)
         # input(q_val.shape)
         return q_val
-
 
     def adv_gradient_rescale(self):
         for layer in self.adv_heads:
