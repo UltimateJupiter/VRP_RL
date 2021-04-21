@@ -43,4 +43,8 @@ agent_params:
         lr: 0.0001
         momentum: 0.95
         eps: 0.01
+    network:
+        l1w: 512
+        l2w: 256
+        l3w: 256
     save_dir: './tmp'

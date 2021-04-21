@@ -34,22 +34,22 @@ class DuelingNetwork(nn.Module):
 
 class BranchingQNetwork(nn.Module):
 
-    def __init__(self, obs, ac_dim, n): 
+    def __init__(self, obs, ac_dim, n, l1w=512, l2w=256, l3w=256, **kwargs): 
 
         super().__init__()
 
         self.ac_dim = ac_dim
         self.n = n 
 
-        self.model = nn.Sequential(nn.Linear(obs, 512), 
+        self.model = nn.Sequential(nn.Linear(obs, l1w), 
                                    nn.ReLU(),
-                                   nn.Linear(512,256), 
+                                   nn.Linear(l1w,l2w), 
                                    nn.ReLU(),
-                                   nn.Linear(256,256), 
+                                   nn.Linear(l2w,l3w), 
                                    nn.ReLU())
 
-        self.value_head = nn.Linear(256, 1)
-        self.adv_heads = nn.ModuleList([nn.Linear(256, n) for i in range(ac_dim)])
+        self.value_head = nn.Linear(l3w, 1)
+        self.adv_heads = nn.ModuleList([nn.Linear(l3w, n) for i in range(ac_dim)])
 
     def forward(self, x): 
 

@@ -65,7 +65,7 @@ class DQN_Agent(object):
 
     def setup_controller(self):
         log("State size: {}, Action size: {}, #Actions/Frame {}".format(self.state_size, self.action_size, self.n_action))
-        self.Qnet = BranchingQNetwork(self.state_size, self.n_action, self.action_size)
+        self.Qnet = BranchingQNetwork(self.state_size, self.n_action, self.action_size, **self.args['network'])
         # self.Qnet = NET(input_size=self.state_size, output_size=self.action_size)
         self.target_Qnet = deepcopy(self.Qnet)
         if self.dev != 'cpu':
