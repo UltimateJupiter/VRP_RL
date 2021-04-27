@@ -4,34 +4,6 @@ import torch.nn.functional as F
 import torch.optim as optim 
 from torch.distributions import Categorical 
 
-
-class DuelingNetwork(nn.Module): 
-
-    def __init__(self, obs, ac): 
-
-        super().__init__()
-
-        self.model = nn.Sequential(nn.Linear(obs, 512), 
-                                   nn.ReLU(), 
-                                   nn.Linear(512, 256), 
-                                   nn.ReLU(), 
-                                   nn.Linear(256, 256), 
-                                   nn.ReLU())
-
-        self.value_head = nn.Linear(128, 1)
-        self.adv_head = nn.Linear(128, ac)
-
-    def forward(self, x): 
-
-        out = self.model(x)
-
-        value = self.value_head(out)
-        adv = self.adv_head(out)
-
-        q_val = value + adv - adv.mean(1).reshape(-1,1)
-        return q_val
-
-
 class BranchingQNetwork(nn.Module):
 
     def __init__(self, obs, ac_dim, n, l1w=512, l2w=256, l3w=256, **kwargs): 
@@ -48,8 +20,12 @@ class BranchingQNetwork(nn.Module):
                                    nn.Linear(l2w,l3w), 
                                    nn.ReLU())
 
-        self.value_head = nn.Linear(l3w, 1)
-        self.adv_heads = nn.ModuleList([nn.Linear(l3w, n) for i in range(ac_dim)])
+        self.value_head = nn.Sequential(nn.Linear(l3w, 128), 
+                                        nn.ReLU(),
+                                        nn.Linear(128,1))
+        self.adv_heads = nn.ModuleList([nn.Sequential(nn.Linear(l3w, 128), 
+                                        nn.ReLU(),
+                                        nn.Linear(128,n)) for i in range(ac_dim)])
 
     def forward(self, x): 
 
