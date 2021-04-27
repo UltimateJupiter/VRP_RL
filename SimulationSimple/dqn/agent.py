@@ -73,7 +73,7 @@ class DQN_Agent(object):
             self.target_Qnet = self.target_Qnet.cuda()
         print(self.Qnet)
 
-    def random_act_constrained(self, state):
+    def random_act_constrained(self, state, rng):
 
         vec_bus, vec_station, t = self.M.unflatten_vec(state)
         schedule = torch.zeros(self.M.n_bus, device=self.dev) + self.M.n_routes
@@ -82,7 +82,7 @@ class DQN_Agent(object):
             if active:
                 schedule[i] = self.M.n_routes
             else:
-                r_ind = np.random.choice(self.M.routes_choice[loc.item()] + [self.M.n_routes])
+                r_ind = rng.choice(self.M.routes_choice[loc.item()] + [self.M.n_routes])
                 schedule[i] = r_ind
         return schedule
     
@@ -103,7 +103,7 @@ class DQN_Agent(object):
         # if np.random.random() <= epsilon / 5:
         # return self.random_act(state)
         if rng.random() <= epsilon:
-            return self.random_act_constrained(state)
+            return self.random_act_constrained(state, rng)
         else:
             state = Variable(state).unsqueeze(0)
             act_values = self.Qnet.forward(state)   # B*n_actions
@@ -179,6 +179,7 @@ class DQN_Agent(object):
             log("Episode {}".format(e), color='red')
             if self.args['fix_date']:
                 np.random.seed(0)
+                action_rng = np.random.RandomState(e)
             else:
                 np.random.seed(e)
             self.M.reset()
@@ -229,20 +230,12 @@ class DQN_Agent(object):
                         self.target_Qnet.load_state_dict(self.Qnet.state_dict())
 
                 total_steps += 1
-        # print(self.stats)
-    # def eval(self, n_episodes):
-    #     for i_ep in range(n_episodes):
-    #         state = np.zeros(self.state_size, dtype=np.uint8)
-    #         screen = self.env.reset()
-    #         state[-1] = screen.transpose(2, 0, 1)
-    #         for t in count():
-    #             self.env.render()
-    #             action = self.act(state, 0)
-    #             next_screen, reward, done, _ = self.env.step(action)
-    #             if done:
-    #                 break
-    #             else:
-    #                 state = np.vstack([state[1:], next_screen.transpose(2, 0, 1)])
+
+            if 'log_path' in self.args:
+                if (e - 1) % self.args['log_freq'] == 0:
+                    fl_dst = os.path.join(self.args['log_path'], 'epoch{}.pth'.format(e + 1))
+                    torch.save(self.Qnet.state_dict(), fl_dst)
+                    log("Save to {}".format(fl_dst))
 
     def load(self, modelpath):
         state_dict = torch.load(modelpath, map_location=lambda storage, loc: storage)

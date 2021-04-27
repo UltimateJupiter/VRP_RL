@@ -9,6 +9,8 @@ from reward import VRPReward
 import numpy as np
 import torch
 
+from datetime import datetime
+
 parser = argparse.ArgumentParser(description='DQN')
 parser.add_argument('--config', default='./training_conf/3s_1l_test.yaml', metavar='PATH')
 parser.add_argument('--save_dir', default='gym-results/', metavar='PATH')
@@ -36,6 +38,10 @@ def main(config):
     # M.print_events()
     config['use_neptune'] = config['use_neptune'] and config['mode'] == 'train'
 
+    log_name = str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-")
+    config['agent_params']['log_path'] = os.path.join(config['agent_params']['save_dir'], log_name)
+    os.makedirs(config['agent_params']['log_path'], exist_ok=True)
+    
     if config['use_neptune']:
         import neptune
         nep_args = config['neptune_params']

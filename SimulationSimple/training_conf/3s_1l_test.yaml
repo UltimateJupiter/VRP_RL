@@ -15,12 +15,12 @@ env_params:
     total_time: 4
 
 reward_params:
-    queue_reward: -2
+    queue_reward: -1
     wait_reward: 0
-    opr_reward: 100
+    opr_reward: 0
     efficiency_reward: 0
     time_penalty_power: 1
-    invalid_route_reward: -1000
+    invalid_route_reward: 0
 
 agent_params:
     double_dqn: True
@@ -47,4 +47,5 @@ agent_params:
         l1w: 512
         l2w: 256
         l3w: 256
-    save_dir: './tmp'
+    save_dir: './model_log/'
+    log_freq: 100
