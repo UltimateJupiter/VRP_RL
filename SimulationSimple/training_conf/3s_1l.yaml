@@ -6,13 +6,13 @@ neptune_params:
     proj_name: 'ultimatejz/VRP-final'
 
 env_params:
-    map_dirc: './config/3s_one_flow'
+    map_dirc: './config/3s_1l_exp'
     n_bus: 1
-    bus_capacity: 12
+    bus_capacity: 10
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
-    total_time: 2
+    total_time: 4
 
 reward_params:
     queue_reward: -1
@@ -47,5 +47,5 @@ agent_params:
         l1w: 256
         l2w: 128
         l3w: 128
-    save_dir: './model_log/3s_oneflow'
+    save_dir: './model_log/3s_1l/'
     log_freq: 25

@@ -3,30 +3,30 @@ mode: 'train'
 use_neptune: True
 
 neptune_params:
-    proj_name: 'ultimatejz/VRP-final'
+    proj_name: 'ultimatejz/VRP-DQN-Simple'
 
 env_params:
-    map_dirc: './config/3s_one_flow'
+    map_dirc: './config/simple'
     n_bus: 1
-    bus_capacity: 12
+    bus_capacity: 70
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
-    total_time: 2
+    total_time: 6
 
 reward_params:
-    queue_reward: -1
+    queue_reward: -0.1
     wait_reward: 0
     opr_reward: 100
     efficiency_reward: 0
     time_penalty_power: 1
-    invalid_route_reward: -100
+    invalid_route_reward: 0
 
 agent_params:
     double_dqn: True
     batch_size: 32
     gamma: 0.99
-    episodes: 1000
+    episodes: 2000
     loss: 'mse'
     fix_date: False
     replay_memory_cap: 100000
@@ -36,16 +36,16 @@ agent_params:
     hist_len: 4
     target_update_freq: 1000
     epsilon:
-        start: 0.1
-        end: 0
-        end_t: 1000
+        start: 0.5
+        end: 0.001
+        end_t: 2000
     optim_params:
-        lr: 0.00002
+        lr: 0.0001
         momentum: 0.95
         eps: 0.01
     network:
-        l1w: 256
-        l2w: 128
-        l3w: 128
-    save_dir: './model_log/3s_oneflow'
-    log_freq: 25
+        l1w: 1024
+        l2w: 1024
+        l3w: 512
+    save_dir: './model_log/simple_1b70c/'
+    log_freq: 100

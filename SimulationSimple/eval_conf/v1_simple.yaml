@@ -1,51 +1,45 @@
 use_gpu: True
 mode: 'train'
-use_neptune: True
+use_neptune: False
 
 neptune_params:
-    proj_name: 'ultimatejz/VRP-final'
+    proj_name: 'ultimatejz/VRP-DQN'
 
 env_params:
-    map_dirc: './config/3s_one_flow'
-    n_bus: 1
-    bus_capacity: 12
+    map_dirc: './config/v1_simple'
+    n_bus: 10
+    bus_capacity: 40
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
-    total_time: 2
 
 reward_params:
-    queue_reward: -1
-    wait_reward: 0
-    opr_reward: 100
+    queue_reward: 0
+    wait_reward: -0.01
+    opr_reward: 0
     efficiency_reward: 0
     time_penalty_power: 1
-    invalid_route_reward: -100
+    invalid_route_reward: -1000
 
 agent_params:
     double_dqn: True
     batch_size: 32
     gamma: 0.99
-    episodes: 1000
+    episodes: 400
     loss: 'mse'
-    fix_date: False
+    fix_date: True
     replay_memory_cap: 100000
     replay_start: 0
-    reward_verbose_freq: 200
+    reward_verbose_freq: 500
     replay_freq: 1
     hist_len: 4
     target_update_freq: 1000
     epsilon:
         start: 0.1
-        end: 0
-        end_t: 1000
+        end: 0.01
+        end_t: 400
     optim_params:
-        lr: 0.00002
+        lr: 0.0001
         momentum: 0.95
         eps: 0.01
-    network:
-        l1w: 256
-        l2w: 128
-        l3w: 128
-    save_dir: './model_log/3s_oneflow'
-    log_freq: 25
+    save_dir: './tmp'

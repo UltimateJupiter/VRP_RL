@@ -1,26 +1,26 @@
 use_gpu: True
 mode: 'train'
-use_neptune: False
+use_neptune: True
 
 neptune_params:
-    proj_name: 'ultimatejz/VRP-DQN-final'
+    proj_name: 'ultimatejz/VRP-final'
 
 env_params:
-    map_dirc: './config/4s_1l_exp'
-    n_bus: 1
-    bus_capacity: 12
+    map_dirc: './config/3s_2l_exp'
+    n_bus: 2
+    bus_capacity: 5
     bus_stop_time: 1
     skip_station: False
     frame_rate: 3
     total_time: 4
 
 reward_params:
-    queue_reward: -1
+    queue_reward: -2
     wait_reward: 0
-    opr_reward: 1000
+    opr_reward: 300
     efficiency_reward: 0
     time_penalty_power: 1
-    invalid_route_reward: -10
+    invalid_route_reward: -100
 
 agent_params:
     double_dqn: True
@@ -36,7 +36,7 @@ agent_params:
     hist_len: 4
     target_update_freq: 1000
     epsilon:
-        start: 0.2
+        start: 0.1
         end: 0
         end_t: 1000
     optim_params:
@@ -47,5 +47,5 @@ agent_params:
         l1w: 256
         l2w: 128
         l3w: 128
-    save_dir: './model_log/'
+    save_dir: './model_log/3s_2l/'
     log_freq: 25
