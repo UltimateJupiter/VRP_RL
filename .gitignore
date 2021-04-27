@@ -136,3 +136,6 @@ sbatchlog/
 .DS_Store
 
 model_log/
+animations/
+*.pptx
+.DS_Store

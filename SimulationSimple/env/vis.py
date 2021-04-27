@@ -65,7 +65,7 @@ def plot_station(fig, ax, station : Station, station_v_cat, C, scale, bar=True, 
         pix_crd_base_bar = ax.transData.transform(crd_base_bar)
         bar_x, bar_y = ax.transAxes.inverted().transform(pix_crd_base_bar)
         ax_bar = fig.add_axes([bar_x - bar_scale_x / 2, bar_y, bar_scale_x, bar_scale_y * 10])
-        ax_bar.bar(np.arange(len(queue)), queue, color=C)
+        ax_bar.bar(np.arange(len(queue)), queue/3, color=C)
         ax_bar.set_ylim(0, scale_bar * 10)
         ax_bar.axis('off')
 
@@ -126,7 +126,9 @@ def get_map_image(M, x_scale, y_scale, br=0.5):
     cropped_im = im[y_shift : y_shift + int(y_scale * pix_scale), x_shift : x_shift + int(x_scale * pix_scale)]
     return cropped_im
 
-def vis_map(M : Map, vec, height=10, margin=0.3, cmap='jet', background=True):
+def vis_map(M : Map, vec, height=10, margin=0.3, cmap='jet', background=True, im_name=None, info=None):
+    if im_name is None:
+        im_name = './sample.jpg'
 
     vec_bus, vec_station, t = vec
 
@@ -151,7 +153,12 @@ def vis_map(M : Map, vec, height=10, margin=0.3, cmap='jet', background=True):
     scale = [scalex, scaley]
 
     queue, wait, opr, efficiency = M.reward_rule.rewards_terms(vec)
-    ax.text(scalex * 5, scaley * 3, "t={}\nQueue:{}  WaitCost={:.4g}  OprCost={:.4g}  BusEfficiency={:.3g}%".format(t, int(queue), wait, opr, efficiency * 100), transform=ax.transAxes, fontsize=scaley * 1200)
+    # ax.text(scalex * 5, scaley * 3, "t={}\nQueue:{}  WaitCost={:.4g}  OprCost={:.4g}  BusEfficiency={:.3g}%".format(t, int(queue), wait, opr, efficiency * 100), transform=ax.transAxes, fontsize=scaley * 1200)
+    
+    log_text = "t={}\nQueue:{}  BusEfficiency={:.3g}%".format(t, int(queue), efficiency * 100)
+    if info is not None:
+        log_text = info + '\n' + log_text
+    ax.text(scalex * 5, scaley * 3, log_text, transform=ax.transAxes, fontsize=scaley * 1200)
 
     for edge in M.edges:
         i, j = edge
@@ -173,5 +180,5 @@ def vis_map(M : Map, vec, height=10, margin=0.3, cmap='jet', background=True):
     ax.axis('off')
     # ax3 = fig.add_axes([0.99, 0.99, 0.1, 0.])
     # ax3.hist([-1, -1, 1, 1, 1, 1, 0])
-    plt.savefig('sample.jpg', dpi=100)
+    plt.savefig(im_name, dpi=100)
     plt.close(fig)
