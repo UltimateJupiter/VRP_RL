@@ -20,12 +20,8 @@ class BranchingQNetwork(nn.Module):
                                    nn.Linear(l2w,l3w), 
                                    nn.ReLU())
 
-        self.value_head = nn.Sequential(nn.Linear(l3w, 128), 
-                                        nn.ReLU(),
-                                        nn.Linear(128,1))
-        self.adv_heads = nn.ModuleList([nn.Sequential(nn.Linear(l3w, 128), 
-                                        nn.ReLU(),
-                                        nn.Linear(128,n)) for i in range(ac_dim)])
+        self.value_head = nn.Linear(l3w, 1)
+        self.adv_heads = nn.ModuleList([nn.Linear(l3w, n) for i in range(ac_dim)])
 
     def forward(self, x): 
 

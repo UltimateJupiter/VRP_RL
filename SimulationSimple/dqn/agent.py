@@ -2,6 +2,7 @@ import os
 import numpy as np
 from copy import deepcopy
 from itertools import count
+import json
 
 import torch
 import torch.nn.functional as F
@@ -233,9 +234,16 @@ class DQN_Agent(object):
 
             if 'log_path' in self.args:
                 if (e - 1) % self.args['log_freq'] == 0:
-                    fl_dst = os.path.join(self.args['log_path'], 'epoch{}.pth'.format(e + 1))
+                    
+                    fl_dst = os.path.join(self.args['log_path'], 'epoch{}.pth'.format(e))
                     torch.save(self.Qnet.state_dict(), fl_dst)
+
+                    json_log = os.path.join(self.args['log_path'], 'stats.json')
+                    with open(json_log, 'w') as outfile:
+                        json.dump(self.stats, outfile)
+
                     log("Save to {}".format(fl_dst))
+                    self.evaluate(e)
 
     def load(self, modelpath):
         state_dict = torch.load(modelpath, map_location=lambda storage, loc: storage)
@@ -246,3 +254,49 @@ class DQN_Agent(object):
         modelpath = os.path.join(self.save_dir, 'QNetwork.pth.tar')
         torch.save(self.Qnet.state_dict(), modelpath)
         print("Saved to model to {}".format(modelpath))
+
+    def evaluate(self, epoch, eval_epochs=10):
+
+        eval_stats = {"reward": []}
+        eval_stats.update({arg: [] for arg in self.info_list})
+        action_rng = np.random.RandomState(0)
+        
+        for e in range(eval_epochs):
+
+            log("EVAL Episode {}".format(e), color='red')
+            if self.args['fix_date']:
+                np.random.seed(0)
+                action_rng = np.random.RandomState(e)
+            else:
+                np.random.seed(e)
+            self.M.reset()
+
+            episode_rewards = []
+            episode_feedback = []
+
+            # Iterate over frames of the episode
+            for t in count():
+                # get current state
+                # vis_map(self.M, self.M.vec)
+                state = self.M.vec_flatten
+                action = self.act(state, 0, action_rng)
+                next_state, reward, done, feedback, scale = self.M.feedback_step(action)
+                episode_feedback.append(feedback)
+                episode_rewards.append(reward.item())
+                
+                if done:
+                    mean_reward = np.mean(episode_rewards)
+                    eval_stats["reward"].append(mean_reward)
+                    mean_feedback = np.mean(np.vstack(episode_feedback), axis=0)
+                    for i, item in enumerate(mean_feedback):
+                        eval_stats[self.info_list[i]].append(item)
+
+                    self.verbose_feedback(mean_reward, mean_feedback, "\nEVAL MEAN Episode {}".format(e))
+                    break
+        
+        if 'log_path' in self.args:
+            json_log = os.path.join(self.args['log_path'], 'eval{}_stats.json'.format(epoch))
+            with open(json_log, 'w') as outfile:
+                json.dump(eval_stats, outfile)
+
+            log("Save to {}".format(json_log))
